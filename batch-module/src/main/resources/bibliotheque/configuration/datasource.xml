@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/jdbc
+       http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+  <context:property-placeholder location="classpath:/properties/application.properties"/>
+
+  <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+    <property name="driverClass" value="${batch.jdbc.driver}" />
+    <property name="url" value="${batch.jdbc.url}" />
+    <property name="username" value="${batch.jdbc.user}" />
+    <property name="password" value="${batch.jdbc.password}" />
+  </bean>
+
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <!-- create tables automatically -->
+  <jdbc:initialize-database data-source="dataSource">
+    <jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-postgresql.sql"/>
+    <jdbc:script location="classpath:/org/springframework/batch/core/schema-postgresql.sql"/>
+    <jdbc:script location="classpath:bibliotheque/database/create_function.sql" />
+    <jdbc:script location="classpath:bibliotheque/database/create_database.sql" />
+  </jdbc:initialize-database>
+
+</beans>
